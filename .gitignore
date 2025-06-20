@@ -12,7 +12,7 @@ crash.log
 *.backup
 
 # Terraform variable files (optional: remove if you're not using secrets here)
-#*.tfvars
+*.tfvars
 
 # Sensitive secrets (optional)
 # terraform.tfvars
@@ -25,3 +25,4 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+terraform.tfvars
