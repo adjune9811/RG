@@ -2,24 +2,47 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
 variables:
-  TF_VERSION: '1.6.0'
+  resource_group_name: 'myTFResourceGroup'
+  location: 'East US'
 
-steps:
-- task: TerraformInstaller@1
-  inputs:
-    terraformVersion: '$(TF_VERSION)'
+stages:
+- stage: Terraform
+  jobs:
+  - job: DeployRG
+    steps:
 
-- script: |
-    terraform init
-  displayName: 'Terraform Init'
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
 
-- script: |
-    terraform plan -out=tfplan
-  displayName: 'Terraform Plan'
+    - script: |
+        export ARM_SUBSCRIPTION_ID=$(subscription_id)
+        export ARM_CLIENT_ID=$(client_id)
+        export ARM_CLIENT_SECRET=$(client_secret)
+        export ARM_TENANT_ID=$(tenant_id)
 
-- script: |
-    terraform apply -auto-approve tfplan
-  displayName: 'Terraform Apply'
+        terraform init
+      displayName: 'Terraform Init'
+
+    - script: |
+        terraform plan \
+          -var="subscription_id=$(subscription_id)" \
+          -var="client_id=$(client_id)" \
+          -var="client_secret=$(client_secret)" \
+          -var="tenant_id=$(tenant_id)" \
+          -var="resource_group_name=$(resource_group_name)" \
+          -var="location=$(location)"
+      displayName: 'Terraform Plan'
+
+    - script: |
+        terraform apply -auto-approve \
+          -var="subscription_id=$(subscription_id)" \
+          -var="client_id=$(client_id)" \
+          -var="client_secret=$(client_secret)" \
+          -var="tenant_id=$(tenant_id)" \
+          -var="resource_group_name=$(resource_group_name)" \
+          -var="location=$(location)"
+      displayName: 'Terraform Apply'
