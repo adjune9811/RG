@@ -13,26 +13,35 @@ stages:
   jobs:
   - job: DeployRG
     steps:
+
+    # ✅ Step 1: Login to Azure using your Service Connection
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'AZ-SPN-idmay25'  # <-- your service connection name
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Azure login successful"
+
+    # ✅ Step 2: Install Terraform
     - task: TerraformInstaller@1
       inputs:
         terraformVersion: 'latest'
 
-    - script: |
-        cat > terraform.tfvars <<EOF
-        subscription_id     = "$(subscription_id)"
-        client_id           = "$(client_id)"
-        client_secret       = "$(client_secret)"
-        tenant_id           = "$(tenant_id)"
-        resource_group_name = "$(resource_group_name)"
-        location            = "$(location)"
-        EOF
-      displayName: 'Generate terraform.tfvars'
-
+    # ✅ Step 3: Terraform Init (auth will now work)
     - script: terraform init
       displayName: 'Terraform Init'
 
-    - script: terraform plan
+    # ✅ Step 4: Terraform Plan
+    - script: |
+        terraform plan \
+          -var="resource_group_name=$(resource_group_name)" \
+          -var="location=$(location)"
       displayName: 'Terraform Plan'
 
-    - script: terraform apply -auto-approve
+    # ✅ Step 5: Terraform Apply
+    - script: |
+        terraform apply -auto-approve \
+          -var="resource_group_name=$(resource_group_name)" \
+          -var="location=$(location)"
       displayName: 'Terraform Apply'
