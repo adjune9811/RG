@@ -29,20 +29,17 @@ stages:
 
     - script: |
         terraform plan \
-          -var="subscription_id=$(subscription_id)" \
-          -var="client_id=$(client_id)" \
-          -var="client_secret=$(client_secret)" \
-          -var="tenant_id=$(tenant_id)" \
-          -var="resource_group_name=$(resource_group_name)" \
-          -var="location=$(location)"
+          export ARM_SUBSCRIPTION_ID=$(subscription_id)
+        export ARM_CLIENT_ID=$(client_id)
+        export ARM_CLIENT_SECRET=$(client_secret)
+        export ARM_TENANT_ID=$(tenant_id)
+
       displayName: 'Terraform Plan'
 
     - script: |
         terraform apply -auto-approve \
-          -var="subscription_id=$(subscription_id)" \
-          -var="client_id=$(client_id)" \
-          -var="client_secret=$(client_secret)" \
-          -var="tenant_id=$(tenant_id)" \
-          -var="resource_group_name=$(resource_group_name)" \
-          -var="location=$(location)"
+          export ARM_SUBSCRIPTION_ID=$(subscription_id)
+        export ARM_CLIENT_ID=$(client_id)
+        export ARM_CLIENT_SECRET=$(client_secret)
+        export ARM_TENANT_ID=$(tenant_id)
       displayName: 'Terraform Apply'
